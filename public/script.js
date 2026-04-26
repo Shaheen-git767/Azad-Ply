@@ -144,7 +144,6 @@ function injectModals() {
                 <div class="cart-total" id="cartTotalDisplay">Total: ₹0</div>
                 <div style="display:flex; gap:1rem;">
                     <button class="btn" style="flex:1;" onclick="checkoutSystem()">Checkout</button>
-                    <button class="btn btn-outline" style="flex:1;" onclick="checkoutWhatsapp()">Order via WhatsApp</button>
                 </div>
             </div>
         </div>
@@ -408,6 +407,21 @@ function renderProductsGrid(productsToRender) {
         const card = document.createElement('div');
         card.className = 'card';
 
+        let unitText = '/unit';
+        const cat = (product.category || '').toLowerCase();
+        const desc = (product.sizeDescription || '').toLowerCase();
+        if (cat.includes('ply') || cat.includes('mica') || cat.includes('board') || cat.includes('laminate')) {
+            unitText = '/sheet';
+        } else if (desc.includes('sqft') && cat.includes('glass')) {
+            unitText = '/sqft';
+        } else if (desc.includes('running ft')) {
+            unitText = '/ft';
+        } else if (desc.includes('set')) {
+            unitText = '/set';
+        } else if (desc.includes('pair')) {
+            unitText = '/pair';
+        }
+
         card.innerHTML = `
             <div class="card-img-container">
               <img src="${product.image}" loading="lazy" alt="${product.name}">
@@ -415,9 +429,9 @@ function renderProductsGrid(productsToRender) {
             <div class="card-body">
                 <p class="card-category">${product.category.toUpperCase()}</p>
                 <h3 class="card-title">${product.name}</h3>
-                ${product.sizeDescription ? `<p style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">${product.sizeDescription}</p>` : ''}
+                ${product.sizeDescription ? `<p style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">Dimensions: ${product.sizeDescription}</p>` : ''}
                 <div class="card-footer">
-                    <span class="card-price">₹${product.price.toLocaleString('en-IN')}</span>
+                    <span class="card-price">₹${product.price.toLocaleString('en-IN')}<span style="font-size: 0.8rem; color: #888; font-weight: normal;"> ${unitText}</span></span>
                     <button class="btn card-btn" onclick="addToCart(${temp})">Add to Cart</button>
                 </div>
             </div>
@@ -482,12 +496,28 @@ function renderCart() {
         const qty = item.qty || 1;
         const itemTotal = item.price * qty;
         total += itemTotal;
+
+        let unitText = '/unit';
+        const cat = (item.category || '').toLowerCase();
+        const desc = (item.sizeDescription || '').toLowerCase();
+        if (cat.includes('ply') || cat.includes('mica') || cat.includes('board') || cat.includes('laminate')) {
+            unitText = '/sheet';
+        } else if (desc.includes('sqft') && cat.includes('glass')) {
+            unitText = '/sqft';
+        } else if (desc.includes('running ft')) {
+            unitText = '/ft';
+        } else if (desc.includes('set')) {
+            unitText = '/set';
+        } else if (desc.includes('pair')) {
+            unitText = '/pair';
+        }
+
         container.innerHTML += `
             <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:15px; border-bottom:1px solid var(--glass-border);">
                 <div style="flex:1; text-align:left;">
                     <div style="font-weight:600; color:var(--primary);">${item.name}</div>
-                    ${item.sizeDescription ? `<div style="font-size:0.8rem; color:#aaa;">${item.sizeDescription}</div>` : ''}
-                    <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">₹${item.price} each</div>
+                    ${item.sizeDescription ? `<div style="font-size:0.8rem; color:#aaa;">Dimensions: ${item.sizeDescription}</div>` : ''}
+                    <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">₹${item.price} <span style="font-size:0.8rem;">${unitText}</span></div>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:5px 10px; border-radius:20px;">
                     <button onclick="updateQty(${index}, -1)" style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.2rem;">-</button>
