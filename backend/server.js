@@ -34,7 +34,7 @@ const isAdmin = async (req, res, next) => {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 app.use(express.json());
 
 // Connect to MongoDB
@@ -389,16 +389,16 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Routes for HTML pages
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
-app.get('/products', (req, res) => res.sendFile(path.join(__dirname, 'public', 'products.html')));
-app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'public', 'contact.html')));
-app.get('/shipping', (req, res) => res.sendFile(path.join(__dirname, 'public', 'shipping.html')));
-app.get('/returns', (req, res) => res.sendFile(path.join(__dirname, 'public', 'returns.html')));
-app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'public', 'terms.html')));
-app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
-app.get('/reset-password.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
-app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'index.html')));
+app.get('/about', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'about.html')));
+app.get('/products', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'products.html')));
+app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'contact.html')));
+app.get('/shipping', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'shipping.html')));
+app.get('/returns', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'returns.html')));
+app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'terms.html')));
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'privacy.html')));
+app.get('/reset-password.html', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'reset-password.html')));
+app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, '../frontend', 'admin.html')));
 
 // --- ADMIN ROUTES ---
 
