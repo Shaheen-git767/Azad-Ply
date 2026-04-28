@@ -221,7 +221,9 @@ app.post('/api/register', async (req, res) => {
     await newCart.save();
 
     // Send Verification Email
-    const verifyLink = `http://localhost:${PORT}/api/verify?token=${verificationToken}`;
+    // const verifyLink = `http://localhost:${PORT}/api/verify?token=${verificationToken}`;
+
+    const verifyLink = `${process.env.BASE_URL}/api/verify?token=${verificationToken}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
