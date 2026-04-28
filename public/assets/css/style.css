@@ -286,6 +286,7 @@ header {
   margin-bottom: 1.5rem;
   color: #fff;
   letter-spacing: -1px;
+  flex-direction: column; 
 }
 
 .hero p {
@@ -294,6 +295,12 @@ header {
   max-width: 700px;
   color: var(--text-muted);
   font-weight: 300;
+   margin-top: 0.5rem;
+}
+.hero h1,
+.hero p {
+  width: 100%;
+  text-align: center;
 }
 
 /* Sections & Typography */
