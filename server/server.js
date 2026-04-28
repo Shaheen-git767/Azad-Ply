@@ -1,4 +1,12 @@
-require('dotenv').config();
+//  require('dotenv').config();//original
+
+require('dotenv').config({
+  path: require('path').join(__dirname, '../.env')
+});
+require('dns').setDefaultResultOrder('ipv4first'); //changes
+
+console.log("MONGO_URI:", process.env.MONGO_URI);//temperory
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -12,7 +20,6 @@ const Order = require('./models/Order');
 const Product = require('./models/Product');
 const Category = require('./models/Category');
 const Setting = require('./models/Setting');
-
 // Admin Middleware
 const isAdmin = async (req, res, next) => {
   try {
@@ -34,68 +41,77 @@ const isAdmin = async (req, res, next) => {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(async () => {
-    console.log('Successfully connected to MongoDB Cluster!');
+// Connect to MongoDB with improved error logging
+// mongoose.connect(process.env.MONGO_URI).then(async () => {
+//     console.log('Successfully connected to MongoDB Cluster!');  //original
 
+
+
+
+// Connect to MongoDB with improved error logging
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 30000,
+  family: 4
+})
+.then(async () => {
+  console.log('MongoDB Connected ');
     // Auto-migrate hardcoded products to DB if empty
     const count = await Product.countDocuments();
     if (count === 0) {
       const products = [
-        { name: 'Green Ply 18mm Commercial', price: 1800, category: 'Green Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Green Ply 19mm Marine (BWP)', price: 2450, category: 'Green Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Green Ply 12mm Commercial', price: 1200, category: 'Green Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Green Ply 6mm Flexible', price: 850, category: 'Green Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Century Ply 18mm Marine', price: 2600, category: 'Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Century Ply 12mm BWP', price: 1500, category: 'Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Local Plywood 18mm MR', price: 1400, category: 'Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Block Board 19mm Pine', price: 1950, category: 'Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'MDF Board 18mm', price: 1100, category: 'Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Particle Board 18mm', price: 800, category: 'Ply', image: '/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
-        { name: 'Merino 1mm High Gloss Laminate', price: 1250, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Merino 1mm Matte Finish Laminate', price: 1100, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Greenlam 1mm Texture Laminate', price: 1350, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Greenlam 0.8mm Wood Grain', price: 850, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Sunmica 1mm Solid Color', price: 950, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Sunmica 0.8mm White', price: 700, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'CenturyLaminates 1mm Metallic', price: 1500, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'CenturyLaminates 0.8mm Fabric', price: 900, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Virgo 1mm Digital Print', price: 1800, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Virgo 0.8mm Gloss', price: 800, category: 'Mica', image: '/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
-        { name: 'Fevicol SH Marine 1kg', price: 420, category: 'Fevicol', image: '/images/fevicol_1777180710788.png', sizeDescription: '1 Kg Bucket' },
-        { name: 'Fevicol SH Marine 5kg', price: 1950, category: 'Fevicol', image: '/images/fevicol_1777180710788.png', sizeDescription: '5 Kg Bucket' },
-        { name: 'Fevicol HeatX 1L', price: 550, category: 'Fevicol', image: '/images/fevicol_1777180710788.png', sizeDescription: '1 Litre Tin' },
-        { name: 'Fevicol SR 998 1L', price: 480, category: 'Fevicol', image: '/images/fevicol_1777180710788.png', sizeDescription: '1 Litre Tin' },
-        { name: 'Fevicol Probond 1kg', price: 380, category: 'Fevicol', image: '/images/fevicol_1777180710788.png', sizeDescription: '1 Kg Pack' },
-        { name: 'Clear Toughened Glass 12mm', price: 150, category: 'Glass', image: '/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
-        { name: 'Clear Toughened Glass 10mm', price: 120, category: 'Glass', image: '/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
-        { name: 'Frosted Glass 8mm', price: 90, category: 'Glass', image: '/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
-        { name: 'Tinted Grey Glass 10mm', price: 140, category: 'Glass', image: '/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
-        { name: 'Mirror Glass 5mm', price: 70, category: 'Glass', image: '/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
-        { name: 'Aluminium Sliding Track 2 Track', price: 150, category: 'Aluminium', image: '/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
-        { name: 'Aluminium Sliding Track 3 Track', price: 200, category: 'Aluminium', image: '/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
-        { name: 'Aluminium Partition Section', price: 120, category: 'Aluminium', image: '/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
-        { name: 'Aluminium Window Interlock', price: 80, category: 'Aluminium', image: '/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
-        { name: 'Aluminium Handle Section', price: 90, category: 'Aluminium', image: '/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
-        { name: 'Niva Solid Teak Wood Door', price: 12500, category: 'Niva Door', image: '/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
-        { name: 'Milenium Flush Door 30mm', price: 4500, category: 'Milenium Door', image: '/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
-        { name: 'Membrane Door Carved', price: 5500, category: 'Door', image: '/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
-        { name: 'Laminated Flush Door', price: 5000, category: 'Door', image: '/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
-        { name: 'PVC Bathroom Door', price: 2200, category: 'Door', image: '/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x2.5 ft' },
-        { name: 'Tesa Mortise Lock & Handle Set', price: 1850, category: 'Tesa Handle', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' },
-        { name: 'Europa Main Door Lock', price: 2400, category: 'Handle', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
-        { name: 'Godrej Navtal Padlock', price: 850, category: 'Handle', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
-        { name: 'SS Pull Handle 12 inch', price: 600, category: 'Handle', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Pair' },
-        { name: 'Brass Antique Mortise Handle', price: 2200, category: 'Handle', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' },
-        { name: 'Jaguar Pillar Cock Tap', price: 1250, category: 'Taps', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
-        { name: 'Cera Wall Mixer Set', price: 3500, category: 'Taps', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' },
-        { name: 'Hindware Bib Cock', price: 650, category: 'Taps', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
-        { name: 'Plumber Angle Valve', price: 350, category: 'Taps', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
-        { name: 'Health Faucet Gun with Pipe', price: 800, category: 'Taps', image: '/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' }
+        { name: 'Green Ply 18mm Commercial', price: 1800, category: 'Green Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Green Ply 19mm Marine (BWP)', price: 2450, category: 'Green Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Green Ply 12mm Commercial', price: 1200, category: 'Green Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Green Ply 6mm Flexible', price: 850, category: 'Green Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Century Ply 18mm Marine', price: 2600, category: 'Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Century Ply 12mm BWP', price: 1500, category: 'Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Local Plywood 18mm MR', price: 1400, category: 'Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Block Board 19mm Pine', price: 1950, category: 'Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'MDF Board 18mm', price: 1100, category: 'Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Particle Board 18mm', price: 800, category: 'Ply', image: '/assets/images/cat_plywood_1777179257274.png', sizeDescription: '8x4 sqft' },
+        { name: 'Merino 1mm High Gloss Laminate', price: 1250, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Merino 1mm Matte Finish Laminate', price: 1100, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Greenlam 1mm Texture Laminate', price: 1350, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Greenlam 0.8mm Wood Grain', price: 850, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Sunmica 1mm Solid Color', price: 950, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Sunmica 0.8mm White', price: 700, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'CenturyLaminates 1mm Metallic', price: 1500, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'CenturyLaminates 0.8mm Fabric', price: 900, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Virgo 1mm Digital Print', price: 1800, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Virgo 0.8mm Gloss', price: 800, category: 'Mica', image: '/assets/images/cat_mica_1777179353524.png', sizeDescription: '8x4 sqft' },
+        { name: 'Fevicol SH Marine 1kg', price: 420, category: 'Fevicol', image: '/assets/images/fevicol_1777180710788.png', sizeDescription: '1 Kg Bucket' },
+        { name: 'Fevicol SH Marine 5kg', price: 1950, category: 'Fevicol', image: '/assets/images/fevicol_1777180710788.png', sizeDescription: '5 Kg Bucket' },
+        { name: 'Fevicol HeatX 1L', price: 550, category: 'Fevicol', image: '/assets/images/fevicol_1777180710788.png', sizeDescription: '1 Litre Tin' },
+        { name: 'Fevicol SR 998 1L', price: 480, category: 'Fevicol', image: '/assets/images/fevicol_1777180710788.png', sizeDescription: '1 Litre Tin' },
+        { name: 'Fevicol Probond 1kg', price: 380, category: 'Fevicol', image: '/assets/images/fevicol_1777180710788.png', sizeDescription: '1 Kg Pack' },
+        { name: 'Clear Toughened Glass 12mm', price: 150, category: 'Glass', image: '/assets/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
+        { name: 'Clear Toughened Glass 10mm', price: 120, category: 'Glass', image: '/assets/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
+        { name: 'Frosted Glass 8mm', price: 90, category: 'Glass', image: '/assets/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
+        { name: 'Tinted Grey Glass 10mm', price: 140, category: 'Glass', image: '/assets/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
+        { name: 'Mirror Glass 5mm', price: 70, category: 'Glass', image: '/assets/images/cat_glass_1777179301984.png', sizeDescription: 'Per Sqft' },
+        { name: 'Aluminium Sliding Track 2 Track', price: 150, category: 'Aluminium', image: '/assets/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
+        { name: 'Aluminium Sliding Track 3 Track', price: 200, category: 'Aluminium', image: '/assets/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
+        { name: 'Aluminium Partition Section', price: 120, category: 'Aluminium', image: '/assets/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
+        { name: 'Aluminium Window Interlock', price: 80, category: 'Aluminium', image: '/assets/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
+        { name: 'Aluminium Handle Section', price: 90, category: 'Aluminium', image: '/assets/images/cat_alum_1777179318925.png', sizeDescription: 'Per Running Ft' },
+        { name: 'Niva Solid Teak Wood Door', price: 12500, category: 'Niva Door', image: '/assets/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
+        { name: 'Milenium Flush Door 30mm', price: 4500, category: 'Milenium Door', image: '/assets/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
+        { name: 'Membrane Door Carved', price: 5500, category: 'Door', image: '/assets/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
+        { name: 'Laminated Flush Door', price: 5000, category: 'Door', image: '/assets/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x3 ft' },
+        { name: 'PVC Bathroom Door', price: 2200, category: 'Door', image: '/assets/images/cat_doors_1777179276618.png', sizeDescription: 'Standard 7x2.5 ft' },
+        { name: 'Tesa Mortise Lock & Handle Set', price: 1850, category: 'Tesa Handle', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' },
+        { name: 'Europa Main Door Lock', price: 2400, category: 'Handle', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
+        { name: 'Godrej Navtal Padlock', price: 850, category: 'Handle', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
+        { name: 'SS Pull Handle 12 inch', price: 600, category: 'Handle', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Pair' },
+        { name: 'Brass Antique Mortise Handle', price: 2200, category: 'Handle', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' },
+        { name: 'Jaguar Pillar Cock Tap', price: 1250, category: 'Taps', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
+        { name: 'Cera Wall Mixer Set', price: 3500, category: 'Taps', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' },
+        { name: 'Hindware Bib Cock', price: 650, category: 'Taps', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
+        { name: 'Plumber Angle Valve', price: 350, category: 'Taps', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Piece' },
+        { name: 'Health Faucet Gun with Pipe', price: 800, category: 'Taps', image: '/assets/images/door_handle_1777180690929.png', sizeDescription: 'Per Set' }
       ];
       await Product.insertMany(products);
       console.log('Migrated hardcoded products to MongoDB!');
@@ -122,7 +138,26 @@ mongoose.connect(process.env.MONGO_URI)
       }
     }
   })
-  .catch((err) => console.error('MongoDB connection error:', err));
+  .catch((err) => {
+    console.error('CRITICAL: MongoDB connection failed!');
+    console.error('Error Details:', err.message);
+    if (err.name === 'MongooseServerSelectionError') {
+      console.error('Possible causes:');
+      console.error('1. Your IP address is not whitelisted in MongoDB Atlas.');
+      console.error('2. Your network firewall is blocking port 27017.');
+      console.error('3. The MongoDB Atlas cluster is currently paused or down.');
+      
+      // Attempt to fetch public IP to help the user
+      require('https').get('https://api.ipify.org', (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+          console.log('\nACTION REQUIRED: Please ensure this IP is whitelisted in Atlas:', data);
+          console.log('Whitelist Link: https://cloud.mongodb.com/v2/your-cluster-id#security/network/whitelist');
+        });
+      }).on('error', () => {});
+    }
+  });
 
 // Configure Email Transporter
 const transporter = nodemailer.createTransport({
@@ -389,16 +424,16 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Routes for HTML pages
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
-app.get('/products', (req, res) => res.sendFile(path.join(__dirname, 'public', 'products.html')));
-app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'public', 'contact.html')));
-app.get('/shipping', (req, res) => res.sendFile(path.join(__dirname, 'public', 'shipping.html')));
-app.get('/returns', (req, res) => res.sendFile(path.join(__dirname, 'public', 'returns.html')));
-app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'public', 'terms.html')));
-app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
-app.get('/reset-password.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
-app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'index.html')));
+app.get('/about', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'about.html')));
+app.get('/products', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'products.html')));
+app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'contact.html')));
+app.get('/shipping', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'shipping.html')));
+app.get('/returns', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'returns.html')));
+app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'terms.html')));
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'privacy.html')));
+app.get('/reset-password.html', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'reset-password.html')));
+app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'admin.html')));
 
 // --- ADMIN ROUTES ---
 
