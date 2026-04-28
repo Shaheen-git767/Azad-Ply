@@ -296,7 +296,7 @@ app.post('/api/forgot-password', async (req, res) => {
     await user.save();
 
     // const resetLink = `http://localhost:${PORT}/reset-password.html?token=${resetToken}`;
-    const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${token}`;
+ const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${resetToken}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
