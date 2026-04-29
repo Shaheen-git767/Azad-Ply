@@ -160,13 +160,29 @@ mongoose.connect(process.env.MONGO_URI, {
   });
 
 // Configure Email Transporter
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',                                                            previous
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS
+//   }
+// });
+
+
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   }
 });
+const info = await transporter.sendMail(mailOptions);   //added
+console.log("MAIL SENT:", info.response);
+
+
 
 // GET Public Products from MongoDB
 app.get('/api/products', async (req, res) => {
@@ -225,7 +241,8 @@ app.post('/api/register', async (req, res) => {
 
     const verifyLink = `${process.env.BASE_URL}/api/verify?token=${verificationToken}`;
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      // from: process.env.EMAIL_USER,
+      from: `"Azad Ply" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Verify your Azad Ply Account',
       html: `
