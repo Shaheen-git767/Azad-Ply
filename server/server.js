@@ -161,6 +161,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Brevo API Email Function
 const sendEmail = ({ to, subject, html, replyTo }) => {
+  console.log(`[Email] Attempting to send email to: ${to} | Subject: ${subject}`);
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({
       sender: { name: "Azad Ply", email: process.env.EMAIL_USER },
@@ -179,7 +180,7 @@ const sendEmail = ({ to, subject, html, replyTo }) => {
         'accept': 'application/json',
         'api-key': process.env.EMAIL_PASS,
         'content-type': 'application/json',
-        'content-length': data.length
+        'content-length': Buffer.byteLength(data)
       }
     };
 
@@ -187,18 +188,27 @@ const sendEmail = ({ to, subject, html, replyTo }) => {
       let responseBody = '';
       res.on('data', (chunk) => responseBody += chunk);
       res.on('end', () => {
+        console.log(`[Email] Brevo Response Status: ${res.statusCode}`);
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(JSON.parse(responseBody));
+          console.log(`[Email] Success: Email sent to ${to}`);
+          resolve(JSON.parse(responseBody || '{}'));
         } else {
-          console.error('Brevo API Error:', responseBody);
+          console.error(`[Email] Brevo API Error: ${responseBody}`);
           reject(new Error(`Brevo API returned status ${res.statusCode}: ${responseBody}`));
         }
       });
     });
 
     req.on('error', (err) => {
-      console.error('Request Error:', err);
+      console.error('[Email] Request Error:', err.message);
       reject(err);
+    });
+
+    // Set a timeout of 10 seconds
+    req.setTimeout(10000, () => {
+      console.error('[Email] Request Timeout');
+      req.destroy();
+      reject(new Error('Email sending timed out'));
     });
 
     req.write(data);
@@ -263,6 +273,7 @@ app.post('/api/register', async (req, res) => {
     // const verifyLink = `http://localhost:${PORT}/api/verify?token=${verificationToken}`;
 
     const verifyLink = `${process.env.BASE_URL}/api/verify?token=${verificationToken}`;
+    console.log(`[Auth] Registration: Sending verification email to ${email}`);
     await sendEmail({
       to: email,
       subject: 'Verify your Azad Ply Account',
@@ -275,6 +286,7 @@ app.post('/api/register', async (req, res) => {
         </div>
       `
     });
+    console.log(`[Auth] Registration: Email sent successfully`);
 
     res.json({ success: true, message: 'Account created! Please check your email to verify your account before logging in.' });
   } catch (err) {
@@ -334,6 +346,7 @@ app.post('/api/forgot-password', async (req, res) => {
     // const resetLink = `http://localhost:${PORT}/reset-password.html?token=${resetToken}`;
  const resetLink = `${process.env.BASE_URL}/reset-password.html?token=${resetToken}`;
 
+    console.log(`[Auth] Forgot Password: Sending reset email to ${email}`);
     await sendEmail({
       to: email,
       subject: 'Azad Ply - Password Recovery',
@@ -347,6 +360,7 @@ app.post('/api/forgot-password', async (req, res) => {
         </div>
       `
     });
+    console.log(`[Auth] Forgot Password: Email sent successfully`);
     res.json({ success: true, message: 'A secure password reset link has been sent to your email address!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to process request.' });
@@ -436,6 +450,7 @@ app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
 
+    console.log(`[Contact] Sending inquiry from ${email}`);
     await sendEmail({
       to: 'munmunazad14@gmail.com',
       replyTo: email,
@@ -450,6 +465,7 @@ app.post('/api/contact', async (req, res) => {
         </div>
       `
     });
+    console.log(`[Contact] Inquiry email sent successfully`);
     res.json({ success: true, message: 'Your message has been sent successfully!' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to send message', error: err.message });
