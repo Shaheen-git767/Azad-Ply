@@ -170,17 +170,27 @@ mongoose.connect(process.env.MONGO_URI, {
 
 
 
+// const transporter = nodemailer.createTransport({
+//   host: "smtp.gmail.com",
+//   port: 465,
+//   secure: true,
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS
+//   }
+// });
+// const info = await transporter.sendMail(mailOptions);   //added
+// console.log("MAIL SENT:", info.response);
+
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   }
 });
-const info = await transporter.sendMail(mailOptions);   //added
-console.log("MAIL SENT:", info.response);
 
 
 
