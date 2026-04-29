@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azad Ply - Products</title>
+  <link rel="icon" type="image/png" href="/assets/images/logo.png">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+  <div style="background: var(--primary); color: #fff; padding: 6px 0; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+    <marquee scrollamount="6">🌟 Welcome to Azad Plywood & Furnitures 🌟 Premium Plywood, Wooden Doors, Aluminium, Glass, Mica, and Custom Carpentry! 🚚 Cash on Delivery Available within 50 KM radius of Nagepur Sakaldiha, Chandauli (Pincode: 232109).</marquee>
+  </div>
+  <header>
+    <div class="top-bar">
+      <div>📞 9555431600 &nbsp;|&nbsp; ✉ azadplyfurniture@gmail.com</div>
+      <div>Premium Hardware Delivered Fast</div>
+    </div>
+    <nav class="navbar">
+      <a href="/" class="logo" style="display: flex; align-items: center;"><img src="/assets/images/logo.png" alt="Azad Ply Logo" style="height: 40px; margin-right: 10px; border-radius: 50%;">Azad Ply & <span>Furnitures</span></a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/about">About Us</a>
+        <a href="/products" class="active">Products</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <button class="btn btn-outline" onclick="openModal('authModal')">Login</button>
+        <button class="btn" onclick="openModal('cartModal')">Cart (<span class="cart-count">0</span>)</button>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero" style="min-height: 30vh; padding: 4rem 5%;background: url('/assets/images/hero_bg_1777179237246.png') center/cover no-repeat;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(227,166,85,0.05) 0%, var(--bg-dark) 80%); z-index: -1;"></div>
+    <h1 style="font-size: 3rem;">Premium <span>Catalog</span></h1>
+  </section>
+
+  <main class="container" style="padding-top: 0;">
+    <div style="margin-bottom: 3rem;">
+        <h2 class="section-title" style="text-align: left;">Featured <span>Selections</span></h2>
+        <p class="gray-text" style="margin-bottom: 2rem;">Top-selling premium materials</p>
+        
+        <div style="display:flex; gap:1rem; margin-bottom:2rem; flex-wrap: wrap;">
+            <button class="btn btn-outline filter-btn" onclick="filterProducts('All')">All</button>
+            <button class="btn btn-outline filter-btn" onclick="filterProducts('Ply')">Plywood</button>
+            <button class="btn btn-outline filter-btn" onclick="filterProducts('Door')">Wooden Doors</button>
+            <button class="btn btn-outline filter-btn" onclick="filterProducts('Aluminium')">Aluminium</button>
+            <button class="btn btn-outline filter-btn" onclick="filterProducts('Glass')">Glass</button>
+            <button class="btn btn-outline filter-btn" onclick="filterProducts('Fevicol')">Fevicol</button>
+            <button class="btn btn-outline filter-btn" onclick="filterProducts('Mica')">Mica</button>
+        </div>
+        </div>
+    </div>
+    
+        <div class="product-grid">
+            <div class="card">
+                <span class="badge-gold">BESTSELLER</span>
+                <div class="card-img-container">
+                  <img src="/assets/images/cat_plywood_1777179257274.png" alt="Plywood">
+                </div>
+                <div class="card-body">
+                    <p class="card-category">GREEN PLY</p>
+                    <h3 class="card-title">Premium Plywood Sheet 18mm</h3>
+                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">Dimensions: 8x4 sqft</p>
+                    <div class="card-footer">
+                        <span class="card-price">₹2,450 <span>/sheet</span></span>
+                        <button class="btn card-btn" onclick="addToCart({name:'Premium Plywood Sheet 18mm', price:2450, category:'GREEN PLY', image:'/images/cat_plywood_1777179257274.png', sizeDescription:'8x4 sqft'})">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <span class="badge-gold" style="background:rgba(255,255,255,0.9);">POPULAR</span>
+                <div class="card-img-container">
+                  <img src="/assets/images/cat_doors_1777179276618.png" alt="Door">
+                </div>
+                <div class="card-body">
+                    <p class="card-category">NIVA</p>
+                    <h3 class="card-title">Solid Teak Wood Door</h3>
+                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">Dimensions: Standard 7x3 ft</p>
+                    <div class="card-footer">
+                        <span class="card-price">₹12,500 <span>/unit</span></span>
+                        <button class="btn card-btn" onclick="addToCart({name:'Solid Teak Wood Door', price:12500, category:'NIVA', image:'/images/cat_doors_1777179276618.png', sizeDescription:'Standard 7x3 ft'})">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-img-container">
+                  <img src="/assets/images/fevicol_1777180710788.png" alt="Adhesive">
+                </div>
+                <div class="card-body">
+                    <p class="card-category">FEVICOL</p>
+                    <h3 class="card-title">Fevicol SH Marine 1kg</h3>
+                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">Dimensions: 1 Kg Bucket</p>
+                    <div class="card-footer">
+                        <span class="card-price">₹420 <span>/unit</span></span>
+                        <button class="btn card-btn" onclick="addToCart({name:'Fevicol SH Marine 1kg', price:420, category:'FEVICOL', image:'/images/fevicol_1777180710788.png', sizeDescription:'1 Kg Bucket'})">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <span class="badge-gold">NEW</span>
+                <div class="card-img-container">
+                  <img src="/assets/images/door_handle_1777180690929.png" alt="Door Handle">
+                </div>
+                <div class="card-body">
+                    <p class="card-category">TESA</p>
+                    <h3 class="card-title">Stainless Mortise Handle</h3>
+                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:0.5rem;">Dimensions: Per Set</p>
+                    <div class="card-footer">
+                        <span class="card-price">₹1,850 <span>/unit</span></span>
+                        <button class="btn card-btn" onclick="addToCart({name:'Stainless Mortise Handle', price:1850, category:'TESA', image:'/images/door_handle_1777180690929.png', sizeDescription:'Per Set'})">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <hr style="border-top:1px solid var(--glass-border); margin-bottom:3rem; margin-top: 3rem;">
+    <h2 class="section-title" style="text-align: left; margin-bottom: 1.5rem;">Our Complete <span>Catalog</span></h2>
+
+    <div class="shop-layout">
+      <!-- Category Sidebar -->
+      <aside class="sidebar">
+        <h3>Categories</h3>
+        <ul>
+          <li><a href="javascript:void(0)" class="gold-text filter-btn" onclick="filterProducts('All')">All Products</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Ply')">Plywood</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Door')">Wooden Doors</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Glass')">Architectural Glass</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Aluminium')">Aluminium Frames</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Mica')">Mica & Laminates</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Fevicol')">Fevicol</a></li>
+        </ul>
+        
+        <h3 style="margin-top: 2rem;">Brands</h3>
+        <ul>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Niva')">Niva</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Tesa')">Tesa</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Green Ply')">Green Ply</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Milenium')">Milenium</a></li>
+          <li><a href="javascript:void(0)" class="filter-btn" onclick="filterProducts('Collective Aluminium')">Collective Aluminium FK</a></li>
+        </ul>
+
+        <div style="margin-top: 3rem; background: var(--glass-bg); padding: 1.5rem; border: 1px solid var(--glass-border); border-radius: var(--radius-sm); text-align: center;">
+          <h4 style="color: #fff; margin-bottom: 0.5rem;">Need Help?</h4>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Contact our expert support team directly on WhatsApp.</p>
+          <a href="https://wa.me/919555431600" target="_blank" class="btn btn-outline" style="width: 100%; display: inline-flex; justify-content: center;">WhatsApp Us</a>
+        </div>
+      </aside>
+
+      <!-- Products Grid -->
+      <div style="display: flex; flex-direction: column; gap: 2rem;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 1rem 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+            <span style="color: var(--text-muted); font-size: 0.9rem;">Showing all premium items</span>
+            <select style="background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: var(--radius-sm); outline: none;">
+                <option>Sort by: Featured</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+            </select>
+        </div>
+
+        <div class="product-grid" id="api-products">
+            <!-- Products will be dynamically loaded here by script.js -->
+            <p style="text-align: center; grid-column: 1 / -1; font-weight: 600; color: var(--primary); padding: 3rem;">Loading premium inventory...</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn btn-outline">Load More Products</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Azad Ply & Furnitures</h4>
+        <p>The leading marketplace for hardware, tools, and construction materials wrapped in a premium experience.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/products">Products</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support & Policies</h4>
+        <ul>
+          <li><a href="/shipping">Shipping Policy</a></li>
+          <li><a href="/returns">Returns & Refunds</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Info</h4>
+        <ul>
+          <li><span style="color: var(--primary);">📍</span> Nagepur Sakaldiha, Chandauli</li>
+          <li><span style="color: var(--primary);">🕒</span> 9 AM to 8 PM</li>
+          <li><span style="color: var(--primary);">✉</span> azadplyfurniture@gmail.com</li>
+          <li><span style="color: var(--primary);">📞</span> 9555431600</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 Azad Ply & Furnitures. All rights reserved. Built with ❤️.
+    </div>
+  </footer>
+
+  <script src="/assets/js/script.js"></script>
+</body>
+</html>
