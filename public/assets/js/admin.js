@@ -136,9 +136,28 @@ async function loadCustomers() {
                 <td>${c.email}</td>
                 <td>${c.phone}</td>
                 <td>${date}</td>
+                <td>
+                    <button class="btn-sm btn-danger" onclick="deleteCustomer('${c._id}')">❌ Delete</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
+    }
+}
+
+async function deleteCustomer(id) {
+    if (!confirm("Are you sure you want to delete this user account?")) return;
+    try {
+        const res = await fetch(`/api/admin/customers/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        const data = await res.json();
+        if (data.success) {
+            loadCustomers();
+        }
+    } catch(err) {
+        alert("Error deleting customer.");
     }
 }
 

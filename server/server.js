@@ -549,10 +549,19 @@ app.put('/api/admin/orders/:id', isAdmin, async (req, res) => {
 // Admin Customers
 app.get('/api/admin/customers', isAdmin, async (req, res) => {
   try {
-    const customers = await User.find({ role: 'customer' }).select('-password -resetPasswordToken -resetPasswordExpires');
+    const customers = await User.find({ role: 'customer', isVerified: true }).select('-password -resetPasswordToken -resetPasswordExpires');
     res.json({ success: true, customers });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.delete('/api/admin/customers/:id', isAdmin, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Customer deleted successfully!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to delete customer' });
   }
 });
 

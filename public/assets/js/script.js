@@ -30,11 +30,11 @@ function injectModals() {
                 <!-- SIGN IN FORM -->
                 <div id="signInContainer">
                     <div class="auth-header">
-                        <h2>Sign In</h2>
-                        <p>New customer? <a href="#" onclick="toggleAuthMode(event, 'signup')">Create a free account &rarr;</a></p>
+                        <h2>Login</h2>
+                        <p>New customer? <a href="#" class="highlight-link" onclick="toggleAuthMode(event, 'signup')">Create Account &rarr;</a></p>
                     </div>
                     
-                    <div class="auth-divider">or sign in with email</div>
+                    <div class="auth-divider">or login with email</div>
                     
                     <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off">
                         <div class="form-group">
@@ -53,11 +53,11 @@ function injectModals() {
                         </div>
                         
                         <div class="auth-footer">
-                            <label><input type="checkbox" id="loginRemember"> Remember me on this device</label>
+                            <label><input type="checkbox" id="loginRemember"> Remember me</label>
                             <a href="#" class="gold-text" onclick="handleForgotPassword(event)">Forgot password?</a>
                         </div>
                         
-                        <button type="submit" class="btn" style="width: 100%; padding: 1rem;">Sign In &rarr;</button>
+                        <button type="submit" class="btn" style="width: 100%; padding: 1rem;">Login &rarr;</button>
                         <div style="text-align: center; margin-top: 1rem;"><a href="#" class="gold-text" onclick="closeModal('authModal')">&larr; Back to Home</a></div>
                     </form>
                 </div>
@@ -66,7 +66,7 @@ function injectModals() {
                 <div id="signUpContainer" style="display: none;">
                     <div class="auth-header">
                         <h2>Create Account</h2>
-                        <p>Already have an account? <a href="#" onclick="toggleAuthMode(event, 'signin')">Sign In &rarr;</a></p>
+                        <p>Already have an account? <a href="#" onclick="toggleAuthMode(event, 'signin')">Login &rarr;</a></p>
                     </div>
                     
                     <div class="auth-divider">or register with email</div>
@@ -206,21 +206,31 @@ function injectModals() {
 }
 
 function updateLoginState() {
-    const loginBtns = document.querySelectorAll(`button[onclick*="Modal('authModal')"], button[onclick*="Modal('loginModal')"]`);
+    const authContainers = document.querySelectorAll('.navbar div:last-child');
 
-    loginBtns.forEach(btn => {
+    authContainers.forEach(container => {
         if (currentUser) {
-            btn.innerHTML = `👤 ${currentUser.firstName}`;
-            btn.onclick = () => {
-                if (confirm("Do you want to log out?")) {
-                    currentUser = null;
-                    localStorage.removeItem('hw_user');
-                    updateLoginState();
-                }
-            };
+            container.innerHTML = `
+                <button class="btn btn-outline" style="cursor: default;">👤 ${currentUser.firstName}</button>
+                <button class="btn" onclick="handleLogout()">Logout</button>
+                <button class="btn" onclick="openModal('cartModal')">Cart (<span class="cart-count">${cart.reduce((sum, item) => sum + (item.qty || 1), 0)}</span>)</button>
+            `;
         } else {
-            btn.innerHTML = `Login`;
-            btn.onclick = () => openModal('authModal');
+            container.innerHTML = `
+                <button class="btn btn-outline" onclick="openModal('authModal')">Login</button>
+                <button class="btn" onclick="openModal('cartModal')">Cart (<span class="cart-count">${cart.reduce((sum, item) => sum + (item.qty || 1), 0)}</span>)</button>
+            `;
+        }
+    });
+}
+
+function handleLogout() {
+    showCustomConfirm("Logout", "Are you sure you want to log out?").then(confirmed => {
+        if (confirmed) {
+            currentUser = null;
+            localStorage.removeItem('hw_user');
+            updateLoginState();
+            window.location.href = '/';
         }
     });
 }
@@ -300,7 +310,7 @@ async function handleLogin(e) {
         updateLoginState();
         closeModal('authModal');
     } else {
-        alert(data.message);
+        showCustomAlert("Login Failed", data.message);
     }
 }
 
@@ -308,7 +318,7 @@ async function handleForgotPassword(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     if (!email) {
-        return alert("Please enter your email address in the Email field first, then click 'Forgot password?'.");
+        return showCustomAlert("Email Required", "Please enter your email address in the Email field first, then click 'Forgot password?'.");
     }
     
     const btn = e.target;
@@ -323,9 +333,9 @@ async function handleForgotPassword(e) {
             body: JSON.stringify({ email })
         });
         const data = await res.json();
-        alert(data.message);
+        showCustomAlert("Password Reset", data.message);
     } catch (err) {
-        alert("Server error. Could not send password reset email.");
+        showCustomAlert("Error", "Server error. Could not send password reset email.");
     } finally {
         btn.textContent = originalText;
         btn.style.pointerEvents = 'auto';
@@ -378,9 +388,9 @@ async function handleRegister(e) {
             updateLoginState();
         }
         closeModal('authModal');
-        alert(data.message || 'Account successfully created! Please check your email to verify your account.');
+        showCustomAlert("Verify Your Email", `<b>Welcome to Azad Ply!</b><br><br>${data.message || 'Account successfully created! Please check your email to verify your account.'}`);
     } else {
-        alert(data.message || 'Failed to create account');
+        showCustomAlert("Registration Failed", data.message || 'Failed to create account');
     }
 }
 
@@ -458,6 +468,19 @@ function filterProducts(category) {
         const filtered = globalProducts.filter(p => p.category.includes(category) || p.name.includes(category));
         renderProductsGrid(filtered);
     }
+}
+
+function sortProducts() {
+    const val = document.getElementById('sortSelect').value;
+    let sorted = [...globalProducts];
+    
+    if (val === 'low') {
+        sorted.sort((a, b) => a.price - b.price);
+    } else if (val === 'high') {
+        sorted.sort((a, b) => b.price - a.price);
+    }
+    
+    renderProductsGrid(sorted);
 }
 
 function addToCart(product) {
@@ -786,12 +809,12 @@ async function handleContactSubmit(event) {
             body: JSON.stringify({ name, email, subject, message })
         });
         const data = await res.json();
-        alert(data.message);
+        showCustomAlert("Message Sent", data.message);
         if (data.success) {
             event.target.reset();
         }
     } catch (err) {
-        alert('Server error. Could not send message.');
+        showCustomAlert("Error", 'Server error. Could not send message.');
     } finally {
         btn.textContent = originalText;
         btn.disabled = false;

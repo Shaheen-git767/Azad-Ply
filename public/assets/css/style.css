@@ -65,6 +65,12 @@ input:focus, textarea:focus, select:focus {
   background-color: rgba(255,255,255,0.05);
 }
 
+option {
+  background-color: #121215;
+  color: #fff;
+  padding: 10px;
+}
+
 input::placeholder, textarea::placeholder {
   color: #666;
 }
@@ -655,6 +661,19 @@ header {
 /* Decorative Utils */
 .gold-text { color: var(--primary); }
 .text-center { text-align: center; }
+
+.highlight-link {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: var(--transition);
+}
+
+.highlight-link:hover {
+  color: var(--primary-hover);
+  letter-spacing: 0.5px;
+}
 
 /* Contact Form */
 .contact-wrapper {
